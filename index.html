@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Cosmos God-Tier</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: -apple-system, sans-serif; }
+        #star-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--t) infinite ease-in-out; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+        #chat-area { position: absolute; inset: 0 0 85px 0; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; z-index: 2; visibility: hidden; }
+        .bubble { max-width: 85%; width: fit-content; padding: 10px 14px; border-radius: 18px; color: #fff; background: rgba(45, 45, 55, 0.7); backdrop-filter: blur(15px); border: 0.5px solid rgba(255, 255, 255, 0.1); }
+        .my { align-self: flex-end; background: rgba(0, 110, 255, 0.5); border-bottom-right-radius: 4px; }
+        .other { align-self: flex-start; border-bottom-left-radius: 4px; }
+        .prog-wrap { width: 140px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 8px 0; overflow: hidden; }
+        .prog-fill { height: 100%; background: #ffcc00; width: 0%; transition: width 0.3s; }
+        video, img { width: 100%; max-width: 270px; border-radius: 12px; margin-top: 5px; display: block; }
+        .input-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(0,0,0,0.9); display: none; align-items: center; padding: 10px; gap: 10px; z-index: 10; border-top: 0.5px solid #333; }
+        #msgInput { flex: 1; height: 40px; border-radius: 20px; border: none; background: #222; color: #fff; padding: 0 15px; outline: none; }
+        .send-btn { width: 40px; height: 40px; background: #0088cc; border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
+        #login-overlay { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; justify-content: center; align-items: center; }
+        .box { background: #1c1c1e; padding: 25px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
+        input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: none; background: #2c2c2e; color: #fff; outline: none; }
+    </style>
+</head>
+<body>
+    <div id="star-field"></div>
+    <div id="login-overlay"><div class="box"><h2 style="color:#0088cc">Cosmos 2026</h2><input type="text" id="u" placeholder="Ник"><input type="password" id="p" placeholder="Пароль"><button onclick="auth()" style="width:100%; padding:12px; border-radius:12px; background:#0088cc; color:#fff; border:none; font-weight:bold;">Войти</button></div></div>
+    <div id="chat-area"></div>
+    <div class="input-bar" id="inputBar"><label style="font-size: 24px; cursor: pointer;">📎<input type="file" id="f" style="display:none" onchange="sendFile()"></label><input type="text" id="msgInput" placeholder="Сообщение..."><button class="send-btn" onclick="sendText()">➤</button></div>
+
+<script>
+    const TOPIC = "cosmos_room_final";
+    const CHAT_URL = `https://ntfy.sh/${TOPIC}`;
+    let USER = "", PASS = "";
+
+    function createStars() {
+        const field = document.getElementById('star-field');
+        for(let i=0; i<300; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 2;
+            star.style.width = size+'px'; star.style.height = size+'px';
+            star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
+            star.style.setProperty('--t', (1.5 + Math.random()*3.5)+'s');
+            field.appendChild(star);
+        }
+    }
+    createStars();
+
+    function auth() {
+        USER = document.getElementById('u').value.trim();
+        PASS = document.getElementById('p').value.trim();
+        if(USER && PASS) {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('chat-area').style.visibility = 'visible';
+            document.getElementById('inputBar').style.display = 'flex';
+            listen();
+        }
+    }
+
+    function addBubble(text, time, sender, isMe, isFile=false, fName="", statusId=null) {
+        const area = document.getElementById('chat-area');
+        let d = statusId ? document.getElementById(statusId) : null;
+        if(!d) {
+            d = document.createElement('div');
+            if(statusId) d.id = statusId;
+            d.className = 'bubble ' + (isMe ? 'my' : 'other');
+            area.appendChild(d);
+        }
+        let content = text;
+        if(isFile && !statusId) {
+            const ext = fName.split('.').pop().toLowerCase();
+            if(['mp4','webm','mov'].includes(ext)) content = `<video controls playsinline src="${text}"></video>`;
+            else if(['jpg','jpeg','png','gif','webp'].includes(ext)) content = `<img src="${text}">`;
+            else content = `<a href="${text}" target="_blank" style="color:#ffcc00;">📄 ${fName}</a>`;
+        }
+        d.innerHTML = `<b style="font-size:0.75em; color:#0088cc; display:block; margin-bottom:2px;">${sender}</b><div>${content}</div><small style="opacity:0.5; float:right; font-size:0.55em; margin-top:4px;">${time}</small>`;
+        area.scrollTop = area.scrollHeight;
+    }
+
+    async function sendText() {
+        const input = document.getElementById('msgInput');
+        if(!input.value) return;
+        const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        addBubble(input.value, t, USER, true);
+        await fetch(CHAT_URL, { method: 'POST', body: JSON.stringify({ p: PASS, u: USER, t: t, m: input.value }) });
+        input.value = '';
+    }
+
+    function sendFile() {
+        const fInput = document.getElementById('f');
+        const file = fInput.files[0];
+        if(!file) return;
+        const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        const myId = 'up-' + Date.now();
+        
+        addBubble(`Летит в космос...<div class="prog-wrap"><div id="bar-${myId}" class="prog-fill"></div></div>`, t, USER, true, false, "", myId);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const xhr = new XMLHttpRequest();
+        // Используем прокси Telegraph — он ест всё
+        xhr.open('POST', 'https://telegra.ph/upload', true);
+        
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const perc = Math.round((e.loaded / e.total) * 100);
+                const bar = document.getElementById('bar-' + myId);
+                if(bar) bar.style.width = perc + '%';
+            }
+        };
+
+        xhr.onload = async () => {
+            try {
+                const res = JSON.parse(xhr.responseText);
+                if(res[0] && res[0].src) {
+                    const fullUrl = 'https://telegra.ph' + res[0].src;
+                    document.getElementById(myId).remove();
+                    addBubble(fullUrl, t, USER, true, true, file.name);
+                    await fetch(CHAT_URL, { method: 'POST', body: JSON.stringify({ p: PASS, u: USER, t: t, m: 'FILE', fUrl: fullUrl, fName: file.name }) });
+                } else { throw new Error(); }
+            } catch(e) {
+                alert("Telegraph не принял. Файл > 5МБ или формат не тот.");
+                document.getElementById(myId).remove();
+            }
+        };
+        xhr.onerror = () => { alert("Блокировка сети!"); document.getElementById(myId).remove(); };
+        xhr.send(formData);
+        fInput.value = '';
+    }
+
+    function listen() {
+        const es = new EventSource(`${CHAT_URL}/sse`);
+        es.onmessage = (e) => {
+            try {
+                const d = JSON.parse(JSON.parse(e.data).message);
+                if(d.p === PASS && d.u !== USER) {
+                    if(d.m === 'FILE') addBubble(d.fUrl, d.t, d.u, false, true, d.fName);
+                    else addBubble(d.m, d.t, d.u, false);
+                }
+            } catch(err) {}
+        };
+    }
+    document.getElementById('msgInput').onkeypress = (e) => { if(e.key==='Enter') sendText(); };
+</script>
+</body>
+</html>
+
+
+
+
+
