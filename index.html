@@ -3,42 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cosmos Chat PRO</title>
+    <title>Cosmos Chat Final</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: -apple-system, sans-serif; color: #fff; }
         
-        /* Фон со звездами */
         #star-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
         .star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--t) infinite ease-in-out; }
         @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
 
-        /* Область чата */
-        #chat-area { position: absolute; inset: 0 0 85px 0; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; z-index: 2; visibility: hidden; scroll-behavior: smooth; }
-        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; background: rgba(45, 45, 55, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 0.5px solid rgba(255, 255, 255, 0.1); position: relative; animation: fadeIn 0.3s ease; }
+        #chat-area { position: absolute; inset: 0 0 85px 0; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; z-index: 2; visibility: hidden; }
+        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; background: rgba(45, 45, 55, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 0.5px solid rgba(255, 255, 255, 0.1); animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .my { align-self: flex-end; background: rgba(0, 110, 255, 0.5); border-bottom-right-radius: 4px; }
         .other { align-self: flex-start; border-bottom-left-radius: 4px; }
 
-        /* Прогресс бар */
-        .prog-wrap { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin: 8px 0; overflow: hidden; }
+        .prog-wrap { width: 140px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 8px 0; overflow: hidden; }
         .prog-fill { height: 100%; background: #00ccff; width: 0%; transition: width 0.2s; }
 
-        /* Медиа */
-        video, img { width: 100%; max-width: 280px; border-radius: 12px; margin-top: 8px; display: block; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        a { color: #00ccff; text-decoration: none; font-weight: bold; }
-
-        /* Панель ввода */
+        video, img { width: 100%; max-width: 270px; border-radius: 12px; margin-top: 8px; display: block; }
+        
         .input-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(10, 10, 15, 0.95); display: none; align-items: center; padding: 10px 15px; gap: 12px; z-index: 10; border-top: 0.5px solid #333; }
         #msgInput { flex: 1; height: 45px; border-radius: 22px; border: none; background: #222; color: #fff; padding: 0 18px; outline: none; font-size: 16px; }
-        .send-btn { width: 45px; height: 45px; background: #0088cc; border-radius: 50%; border: none; color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .send-btn { width: 45px; height: 45px; background: #0088cc; border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
 
-        /* Окно входа */
         #login-overlay { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; justify-content: center; align-items: center; }
-        .box { background: #1c1c1e; padding: 30px; border-radius: 25px; width: 90%; max-width: 340px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        .box input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: none; background: #2c2c2e; color: #fff; outline: none; font-size: 16px; }
-        .box button { width: 100%; padding: 14px; border-radius: 12px; background: #0088cc; color: #fff; border: none; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .box { background: #1c1c1e; padding: 30px; border-radius: 25px; width: 90%; max-width: 340px; text-align: center; border: 1px solid #333; }
+        .box input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: none; background: #2c2c2e; color: #fff; outline: none; }
+        .box button { width: 100%; padding: 14px; border-radius: 12px; background: #0088cc; color: #fff; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -47,35 +40,32 @@
 
     <div id="login-overlay">
         <div class="box">
-            <h2 style="margin-top:0; color:#0088cc;">COSMOS</h2>
-            <input type="text" id="u" placeholder="Ваш ник">
-            <input type="password" id="p" placeholder="Пароль комнаты">
-            <button onclick="auth()">Войти в систему</button>
+            <h2 style="color:#0088cc;">COSMOS</h2>
+            <input type="text" id="u" placeholder="Ник">
+            <input type="password" id="p" placeholder="Пароль">
+            <button onclick="auth()">Войти</button>
         </div>
     </div>
 
     <div id="chat-area"></div>
 
     <div class="input-bar" id="inputBar">
-        <label style="font-size: 26px; cursor: pointer; filter: drop-shadow(0 0 5px #0088cc);">
-            📎<input type="file" id="f" style="display:none" onchange="sendFile()">
-        </label>
+        <label style="font-size: 26px; cursor: pointer;">📎<input type="file" id="f" style="display:none" onchange="sendFile()"></label>
         <input type="text" id="msgInput" placeholder="Сообщение...">
         <button class="send-btn" onclick="sendText()">➤</button>
     </div>
 
 <script>
-    const TOPIC = "cosmos_private_2026"; // Уникальный ID комнаты
-    const NTFY_URL = `https://ntfy.sh/${TOPIC}`;
+    const TOPIC = "cosmos_room_2026"; 
+    const URL = `https://ntfy.sh/${TOPIC}`;
     let USER = "", PASS = "";
 
-    // Создание звездного неба
     function createStars() {
         const field = document.getElementById('star-field');
-        for(let i=0; i<350; i++) {
+        for(let i=0; i<300; i++) {
             const star = document.createElement('div');
             star.className = 'star';
-            const size = Math.random() * 2.5;
+            const size = Math.random() * 2;
             star.style.width = size+'px'; star.style.height = size+'px';
             star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
             star.style.setProperty('--t', (1 + Math.random()*4)+'s');
@@ -84,7 +74,6 @@
     }
     createStars();
 
-    // Авторизация
     function auth() {
         USER = document.getElementById('u').value.trim();
         PASS = document.getElementById('p').value.trim();
@@ -93,14 +82,12 @@
             document.getElementById('chat-area').style.visibility = 'visible';
             document.getElementById('inputBar').style.display = 'flex';
             listen();
-        } else { alert("Введите ник и пароль!"); }
+        }
     }
 
-    // Добавление сообщения на экран
     function addBubble(text, time, sender, isMe, isFile=false, fName="", statusId=null) {
         const area = document.getElementById('chat-area');
         let d = statusId ? document.getElementById(statusId) : null;
-        
         if(!d) {
             d = document.createElement('div');
             if(statusId) d.id = statusId;
@@ -111,97 +98,58 @@
         let content = text;
         if(isFile && !statusId) {
             const ext = fName.split('.').pop().toLowerCase();
-            if(['mp4','webm','mov','quicktime'].includes(ext)) {
-                content = `<video controls playsinline><source src="${text}"></video>`;
-            } else if(['jpg','jpeg','png','gif','webp'].includes(ext)) {
-                content = `<img src="${text}" onclick="window.open('${text}')">`;
-            } else {
-                content = `<a href="${text}" target="_blank">📄 ${fName}</a>`;
-            }
+            if(['mp4','webm','mov'].includes(ext)) content = `<video controls playsinline src="${text}"></video>`;
+            else if(['jpg','jpeg','png','gif','webp'].includes(ext)) content = `<img src="${text}">`;
+            else content = `<a href="${text}" target="_blank" style="color:#00ccff;">📄 ${fName}</a>`;
         }
-
-        d.innerHTML = `
-            <b style="font-size:11px; color:#00ccff; display:block; margin-bottom:4px;">${sender}</b>
-            <div>${content}</div>
-            <small style="opacity:0.5; display:block; text-align:right; font-size:9px; margin-top:5px;">${time}</small>
-        `;
+        d.innerHTML = `<b style="font-size:11px; color:#0088cc; display:block;">${sender}</b><div>${content}</div><small style="opacity:0.5; float:right; font-size:9px;">${time}</small>`;
         area.scrollTop = area.scrollHeight;
     }
 
-    // Отправка текста
     async function sendText() {
         const input = document.getElementById('msgInput');
         if(!input.value) return;
         const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         addBubble(input.value, t, USER, true);
-        
-        await fetch(NTFY_URL, {
-            method: 'POST',
-            body: JSON.stringify({ p: PASS, u: USER, t: t, m: input.value })
-        });
+        await fetch(URL, { method: 'POST', body: JSON.stringify({ p: PASS, u: USER, t: t, m: input.value }) });
         input.value = '';
     }
 
-    // ОТПРАВКА ФАЙЛА (ЧЕРЕЗ CATBOX + PROXY)
-    async function sendFile() {
+    function sendFile() {
         const fInput = document.getElementById('f');
         const file = fInput.files[0];
         if(!file) return;
 
         const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
         const myId = 'up-' + Date.now();
-        
-        addBubble(`Подготовка файла...<div class="prog-wrap"><div id="bar-${myId}" class="prog-fill" style="width:10%"></div></div>`, t, USER, true, false, "", myId);
+        addBubble(`Загрузка...<div class="prog-wrap"><div id="bar-${myId}" class="prog-fill"></div></div>`, t, USER, true, false, "", myId);
 
-        const formData = new FormData();
-        formData.append('reqtype', 'fileupload');
-        formData.append('fileToUpload', file);
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', URL, true);
+        xhr.setRequestHeader('X-Filename', encodeURIComponent(file.name));
 
-        try {
-            // Используем CORS-прокси для обхода блокировок
-            const proxy = "https://corsproxy.io/?";
-            const target = encodeURIComponent("https://catbox.moe/user/api.php");
-            
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', proxy + target, true);
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const bar = document.getElementById('bar-' + myId);
+                if(bar) bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+            }
+        };
 
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) {
-                    const perc = Math.round((e.loaded / e.total) * 100);
-                    const bar = document.getElementById('bar-' + myId);
-                    if(bar) bar.style.width = perc + '%';
-                }
-            };
-
-            xhr.onload = async () => {
-                if(xhr.status === 200) {
-                    const fileUrl = xhr.responseText;
-                    document.getElementById(myId).remove();
-                    
-                    // Показываем у себя
-                    addBubble(fileUrl, t, USER, true, true, file.name);
-                    
-                    // Рассылаем остальным
-                    await fetch(NTFY_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ p: PASS, u: USER, t: t, m: 'FILE', fUrl: fileUrl, fName: file.name })
-                    });
-                } else { throw new Error(); }
-            };
-
-            xhr.onerror = () => { alert("Ошибка сети! Попробуй без VPN."); document.getElementById(myId).remove(); };
-            xhr.send(formData);
-
-        } catch (err) {
-            alert("Ошибка загрузки.");
-            document.getElementById(myId).remove();
-        }
+        xhr.onload = async () => {
+            if(xhr.status === 200) {
+                const res = JSON.parse(xhr.responseText);
+                document.getElementById(myId).remove();
+                addBubble(res.attachment.url, t, USER, true, true, file.name);
+                await fetch(URL, { method: 'POST', body: JSON.stringify({ p: PASS, u: USER, t: t, m: 'FILE', fUrl: res.attachment.url, fName: file.name }) });
+            } else { alert("Ошибка " + xhr.status); document.getElementById(myId).remove(); }
+        };
+        xhr.onerror = () => { alert("Ошибка сети! Выключи VPN."); document.getElementById(myId).remove(); };
+        xhr.send(file);
         fInput.value = '';
     }
 
-    // Прослушивание сообщений
     function listen() {
-        const es = new EventSource(`${NTFY_URL}/sse`);
+        const es = new EventSource(`${URL}/sse`);
         es.onmessage = (e) => {
             try {
                 const d = JSON.parse(JSON.parse(e.data).message);
@@ -212,7 +160,6 @@
             } catch(err) {}
         };
     }
-
     document.getElementById('msgInput').onkeypress = (e) => { if(e.key==='Enter') sendText(); };
 </script>
 </body>
