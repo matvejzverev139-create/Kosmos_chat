@@ -3,148 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cosmos Chat Final</title>
+    <title>COSMOS CHAT</title>
     <style>
-        /* Весь твой стиль остается прежним */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; font-family: -apple-system, sans-serif; color: #fff; }
-        #star-field { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .star { position: absolute; background: #fff; border-radius: 50%; animation: twinkle var(--t) infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
-        #chat-area { position: absolute; inset: 0 0 85px 0; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; z-index: 2; visibility: hidden; }
-        .bubble { max-width: 85%; padding: 12px 16px; border-radius: 20px; background: rgba(45, 45, 55, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 0.5px solid rgba(255, 255, 255, 0.1); }
-        .my { align-self: flex-end; background: rgba(0, 110, 255, 0.5); border-bottom-right-radius: 4px; }
-        .other { align-self: flex-start; border-bottom-left-radius: 4px; }
-        .prog-wrap { width: 140px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 8px 0; overflow: hidden; }
-        .prog-fill { height: 100%; background: #00ccff; width: 0%; transition: width 0.2s; }
-        video, img { width: 100%; max-width: 270px; border-radius: 12px; margin-top: 8px; display: block; }
-        .input-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; background: rgba(10, 10, 15, 0.95); display: none; align-items: center; padding: 10px 15px; gap: 12px; z-index: 10; border-top: 0.5px solid #333; }
-        #msgInput { flex: 1; height: 45px; border-radius: 22px; border: none; background: #222; color: #fff; padding: 0 18px; outline: none; }
-        .send-btn { width: 45px; height: 45px; background: #0088cc; border-radius: 50%; border: none; color: #fff; display: flex; align-items: center; justify-content: center; }
-        #login-overlay { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; justify-content: center; align-items: center; }
-        .box { background: #1c1c1e; padding: 30px; border-radius: 25px; width: 90%; max-width: 340px; text-align: center; }
-        .box input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: none; background: #2c2c2e; color: #fff; }
-        .box button { width: 100%; padding: 14px; border-radius: 12px; background: #0088cc; color: #fff; border: none; font-weight: bold; }
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; overflow: hidden; height: 100vh; }
+        #stars { position: fixed; inset: 0; z-index: 0; }
+        .star { position: absolute; background: #fff; border-radius: 50%; animation: blink var(--d) infinite; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        #chat { position: absolute; inset: 0 0 80px 0; padding: 15px; overflow-y: auto; z-index: 1; display: flex; flex-direction: column; gap: 10px; }
+        .msg { max-width: 80%; padding: 10px 15px; border-radius: 18px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); position: relative; }
+        .my { align-self: flex-end; background: #007bff; }
+        .other { align-self: flex-start; background: #333; }
+        .input-area { position: fixed; bottom: 0; width: 100%; height: 70px; background: #111; display: flex; align-items: center; padding: 10px; gap: 10px; z-index: 10; }
+        input { flex: 1; height: 40px; border-radius: 20px; border: none; padding: 0 15px; background: #222; color: #fff; outline: none; }
+        .btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #007bff; color: #fff; font-size: 20px; }
+        video, img { width: 100%; border-radius: 10px; margin-top: 5px; }
+        #overlay { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; text-align: center; }
     </style>
 </head>
 <body>
-    <div id="star-field"></div>
-    <div id="login-overlay"><div class="box"><h2 style="color:#0088cc;">COSMOS</h2><input type="text" id="u" placeholder="Ник"><input type="password" id="p" placeholder="Пароль"><button onclick="auth()">Войти</button></div></div>
-    <div id="chat-area"></div>
-    <div class="input-bar" id="inputBar"><label style="font-size: 26px; cursor: pointer;">📎<input type="file" id="f" style="display:none" onchange="sendFile()"></label><input type="text" id="msgInput" placeholder="Сообщение..."><button class="send-btn" onclick="sendText()">➤</button></div>
+    <div id="stars"></div>
+    <div id="overlay">
+        <div style="width: 80%">
+            <h1 style="color:#007bff">COSMOS</h1>
+            <input type="text" id="nick" placeholder="Ник" style="width:100%; margin-bottom:10px"><br>
+            <input type="password" id="pass" placeholder="Пароль" style="width:100%; margin-bottom:10px"><br>
+            <button onclick="start()" style="width:100%; padding: 10px; border-radius:10px; border:none; background:#007bff; color:#fff">Войти</button>
+        </div>
+    </div>
+    <div id="chat"></div>
+    <div class="input-area">
+        <label style="font-size:24px">📎<input type="file" id="f" style="display:none" onchange="up()"></label>
+        <input type="text" id="m" placeholder="Сообщение...">
+        <button class="btn" onclick="send()">➤</button>
+    </div>
 
 <script>
-    const TOPIC = "cosmos_room_2026"; 
-    const URL = `https://ntfy.sh/${TOPIC}`;
-    let USER = "", PASS = "";
+    const ROOM = "cosmos_final_2026";
+    const API = `https://ntfy.sh/${ROOM}`;
+    let MY_NICK = "", MY_PASS = "";
 
-    function createStars() {
-        const field = document.getElementById('star-field');
-        for(let i=0; i<300; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = Math.random() * 2;
-            star.style.width = size+'px'; star.style.height = size+'px';
-            star.style.left = Math.random()*100+'%'; star.style.top = Math.random()*100+'%';
-            star.style.setProperty('--t', (1 + Math.random()*4)+'s');
-            field.appendChild(star);
-        }
+    // Звезды
+    const s = document.getElementById('stars');
+    for(let i=0; i<150; i++) {
+        const div = document.createElement('div');
+        div.className = 'star';
+        div.style.width = div.style.height = Math.random()*3+'px';
+        div.style.left = Math.random()*100+'%'; div.style.top = Math.random()*100+'%';
+        div.style.setProperty('--d', Math.random()*3+1+'s');
+        s.appendChild(div);
     }
-    createStars();
 
-    function auth() {
-        USER = document.getElementById('u').value.trim();
-        PASS = document.getElementById('p').value.trim();
-        if(USER && PASS) {
-            document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('chat-area').style.visibility = 'visible';
-            document.getElementById('inputBar').style.display = 'flex';
+    function start() {
+        MY_NICK = document.getElementById('nick').value;
+        MY_PASS = document.getElementById('pass').value;
+        if(MY_NICK && MY_PASS) {
+            document.getElementById('overlay').style.display = 'none';
             listen();
         }
     }
 
-    function addBubble(text, time, sender, isMe, isFile=false, fName="", statusId=null) {
-        const area = document.getElementById('chat-area');
-        let d = statusId ? document.getElementById(statusId) : null;
-        if(!d) {
-            d = document.createElement('div');
-            if(statusId) d.id = statusId;
-            d.className = 'bubble ' + (isMe ? 'my' : 'other');
-            area.appendChild(d);
+    function add(txt, user, isMe, isFile=false, fUrl="") {
+        const c = document.getElementById('chat');
+        const d = document.createElement('div');
+        d.className = `msg ${isMe ? 'my' : 'other'}`;
+        let content = txt;
+        if(isFile) {
+            const ext = fUrl.split('.').pop().toLowerCase();
+            if(['mp4','mov','webm'].includes(ext)) content = `<video src="${fUrl}" controls playsinline></video>`;
+            else if(['jpg','png','gif','jpeg'].includes(ext)) content = `<img src="${fUrl}">`;
+            else content = `<a href="${fUrl}" style="color:#fff">📄 Файл</a>`;
         }
-        let content = text;
-        if(isFile && !statusId) {
-            const ext = fName.split('.').pop().toLowerCase();
-            if(['mp4','webm','mov'].includes(ext)) content = `<video controls playsinline src="${text}"></video>`;
-            else if(['jpg','jpeg','png','gif','webp'].includes(ext)) content = `<img src="${text}">`;
-            else content = `<a href="${text}" target="_blank" style="color:#00ccff;">📄 ${fName}</a>`;
-        }
-        d.innerHTML = `<b style="font-size:11px; color:#0088cc; display:block;">${sender}</b><div>${content}</div><small style="opacity:0.5; float:right; font-size:9px;">${time}</small>`;
-        area.scrollTop = area.scrollHeight;
+        d.innerHTML = `<small style="color:#aaa">${user}</small><div>${content}</div>`;
+        c.appendChild(d);
+        c.scrollTop = c.scrollHeight;
     }
 
-    async function sendText() {
-        const input = document.getElementById('msgInput');
-        if(!input.value) return;
-        const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        addBubble(input.value, t, USER, true);
-        await fetch(URL, { method: 'POST', body: JSON.stringify({ p: PASS, u: USER, t: t, m: input.value }) });
-        input.value = '';
+    async function send() {
+        const i = document.getElementById('m');
+        if(!i.value) return;
+        add(i.value, MY_NICK, true);
+        await fetch(API, { method: 'POST', body: JSON.stringify({ u: MY_NICK, p: MY_PASS, m: i.value }) });
+        i.value = "";
     }
 
-    // ТА САМАЯ ПРЯМАЯ ФУНКЦИЯ БЕЗ ПРОКСИ
-    function sendFile() {
-        const fInput = document.getElementById('f');
-        const file = fInput.files[0];
+    // Самая пробивная загрузка
+    async function up() {
+        const file = document.getElementById('f').files[0];
         if(!file) return;
-
-        const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        const myId = 'up-' + Date.now();
-        addBubble(`Летит в космос...<div class="prog-wrap"><div id="bar-${myId}" class="prog-fill"></div></div>`, t, USER, true, false, "", myId);
-
+        add("Загрузка видео...", "Система", true);
+        
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', URL, true);
-        xhr.setRequestHeader('X-Filename', encodeURIComponent(file.name));
-
-        xhr.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
-                const bar = document.getElementById('bar-' + myId);
-                if(bar) bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
-            }
-        };
-
+        xhr.open('POST', API, true);
+        xhr.setRequestHeader('Filename', encodeURIComponent(file.name));
         xhr.onload = async () => {
-            if(xhr.status === 200) {
-                const res = JSON.parse(xhr.responseText);
-                document.getElementById(myId).remove();
-                addBubble(res.attachment.url, t, USER, true, true, file.name);
-                await fetch(URL, { method: 'POST', body: JSON.stringify({ p: PASS, u: USER, t: t, m: 'FILE', fUrl: res.attachment.url, fName: file.name }) });
-            } else {
-                alert("Сервер перегружен или файл слишком большой! (Код: " + xhr.status + ")");
-                document.getElementById(myId).remove();
-            }
-        };
-        xhr.onerror = () => {
-            alert("Ошибка сети! Бро, реально ВЫКЛЮЧИ VPN.");
-            document.getElementById(myId).remove();
+            const res = JSON.parse(xhr.responseText);
+            const url = res.attachment.url;
+            add("", MY_NICK, true, true, url);
+            await fetch(API, { method: 'POST', body: JSON.stringify({ u: MY_NICK, p: MY_PASS, m: 'FILE', url: url, name: file.name }) });
         };
         xhr.send(file);
-        fInput.value = '';
     }
 
     function listen() {
-        const es = new EventSource(`${URL}/sse`);
-        es.onmessage = (e) => {
-            try {
-                const d = JSON.parse(JSON.parse(e.data).message);
-                if(d.p === PASS && d.u !== USER) {
-                    if(d.m === 'FILE') addBubble(d.fUrl, d.t, d.u, false, true, d.fName);
-                    else addBubble(d.m, d.t, d.u, false);
-                }
-            } catch(err) {}
+        const source = new EventSource(`${API}/sse`);
+        source.onmessage = (e) => {
+            const data = JSON.parse(JSON.parse(e.data).message);
+            if(data.p === MY_PASS && data.u !== MY_NICK) {
+                if(data.m === 'FILE') add("", data.u, false, true, data.url);
+                else add(data.m, data.u, false);
+            }
         };
     }
-    document.getElementById('msgInput').onkeypress = (e) => { if(e.key==='Enter') sendText(); };
 </script>
 </body>
 </html>
